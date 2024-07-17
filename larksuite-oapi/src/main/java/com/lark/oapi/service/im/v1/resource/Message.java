@@ -932,4 +932,30 @@ public class Message {
 
         return resp;
     }
+    public UpdateCardResp updateCard(UpdateCardReq req) throws Exception {
+        // 请求参数选项
+        RequestOptions reqOptions = new RequestOptions();
+
+        // 发起请求
+        RawResponse httpResponse = Transport.send(config, reqOptions, "POST"
+                , "/open-apis/interactive/v1/card/update"
+                , Sets.newHashSet(AccessTokenType.Tenant)
+                , req);
+        // 反序列化
+        UpdateCardResp resp = UnmarshalRespUtil.unmarshalResp(httpResponse, UpdateCardResp.class);
+        if (resp == null) {
+            log.error(String.format(
+                    "%s,callError,req=%s,respHeader=%s,respStatusCode=%s,respBody=%s,", "/open-apis/im/v1/messages"
+                    , Jsons.DEFAULT.toJson(req), Jsons.DEFAULT.toJson(httpResponse.getHeaders()),
+                    httpResponse.getStatusCode(), new String(httpResponse.getBody(),
+                            StandardCharsets.UTF_8)));
+            throw new IllegalArgumentException("The result returned by the server is illegal");
+        }
+
+        resp.setRawResponse(httpResponse);
+        resp.setRequest(req);
+
+        return resp;
+    }
+
 }
