@@ -115,6 +115,35 @@ public class Message {
         return resp;
     }
 
+
+
+    public CreateCardMessageResp create(CreateCardMessageReq req) throws Exception {
+        // 请求参数选项
+        RequestOptions reqOptions = new RequestOptions();
+
+        // 发起请求
+        RawResponse httpResponse = Transport.send(config, reqOptions, "POST"
+                , "/open-apis/ephemeral/v1/send"
+                , Sets.newHashSet(AccessTokenType.Tenant, AccessTokenType.User)
+                , req);
+
+        // 反序列化
+        CreateCardMessageResp resp = UnmarshalRespUtil.unmarshalResp(httpResponse, CreateCardMessageResp.class);
+        if (resp == null) {
+            log.error(String.format(
+                    "%s,callError,req=%s,respHeader=%s,respStatusCode=%s,respBody=%s,", "/open-apis/ephemeral/v1/send"
+                    , Jsons.DEFAULT.toJson(req), Jsons.DEFAULT.toJson(httpResponse.getHeaders()),
+                    httpResponse.getStatusCode(), new String(httpResponse.getBody(),
+                            StandardCharsets.UTF_8)));
+            throw new IllegalArgumentException("The result returned by the server is illegal");
+        }
+
+        resp.setRawResponse(httpResponse);
+        resp.setRequest(req);
+
+        return resp;
+    }
+
     /**
      * 撤回消息，机器人撤回机器人自己发送的消息或群主撤回群内消息。
      * <p> 注意事项:;- 需要开启[机器人能力](https://open.feishu.cn/document/uAjLw4CM/ugTN1YjL4UTN24CO1UjN/trouble-shooting/how-to-enable-bot-ability)  ，撤回消息时机器人仍需要在会话内;- 机器人可以撤回单聊和群组内，自己发送 且 发送时间不超过1天(24小时)的消息;- 若机器人要撤回群内他人发送的消息，则机器人必须是该群的群主、管理员 或者 创建者，且消息发送时间不超过1年;- 无法撤回通过「[批量发送消息](https://open.feishu.cn/document/ukTMukTMukTM/ucDO1EjL3gTNx4yN4UTM)」接口发送的消息 ;
